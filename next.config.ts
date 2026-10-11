@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: ["192.168.1.3"],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -11,6 +11,32 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/your-cloud-name/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.amazonaws.com", // any S3 subdomain
+      },
+      {
+        // local backend during development
+        protocol: "http",
+        hostname: "localhost",
+        port: "5000",
+        pathname: "/uploads/**",
+      },
+    ],
+    formats: ["image/avif", "image/webp"],
   },
 };
 
