@@ -1,5 +1,6 @@
 "use client";
 
+import { api } from "@/lib/api";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -17,9 +18,12 @@ export default function LoginForm() {
     formState: { errors },
   } = useForm<LoginFormValues>();
 
-  const onSubmit: SubmitHandler<LoginFormValues> = (_values) => {
+  const onSubmit: SubmitHandler<LoginFormValues> = (values) => {
     setMessage("Login API is not connected yet.");
-    console.log('value', _values);
+    console.log('value', values);
+    api.post('/auth/login', values)
+    .then(res => console.log(res))
+    .catch(err => console.log(err))
   };
 
   const inputClassName =
