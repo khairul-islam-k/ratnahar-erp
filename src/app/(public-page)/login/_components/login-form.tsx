@@ -1,29 +1,31 @@
 "use client";
 
-import { api } from "@/lib/api";
+import { useAuthStore } from "@/app/stores/auth.store";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-
-type LoginFormValues = {
-  email: string;
-  password: string;
-};
+import { LoginPayload } from "../../../../../types/auth";
+import { authApi } from "@/lib/api/auth";
 
 export default function LoginForm() {
   const [message, setMessage] = useState("");
+  const setAuth = useAuthStore(s => s.setAuth);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>();
+  } = useForm<LoginPayload>();
 
-  const onSubmit: SubmitHandler<LoginFormValues> = (values) => {
-    setMessage("Login API is not connected yet.");
-    console.log('value', values);
-    api.post('/auth/login', values)
-    .then(res => console.log(res))
-    .catch(err => console.log(err))
+  const onSubmit: SubmitHandler<LoginPayload> = async (values) => {
+    setMessage("");
+
+    try {
+      const res = await authApi.login(values);
+      setAuth(res)
+    } catch (error) {
+      console.log('error', error);
+    }
+    
   };
 
   const inputClassName =
