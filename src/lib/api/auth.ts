@@ -1,4 +1,4 @@
-import { AuthResponse, LoginPayload, RefreshResponse } from "../../../types/auth";
+import { AuthResponse, LoginPayload, RefreshResponse, RegisterPayload } from "../../../types/auth";
 import { publicApi, refreshApi } from "../api";
 
 export const authApi = {
@@ -6,6 +6,12 @@ export const authApi = {
     return publicApi
       .post<AuthResponse>("/auth/login", payload)
       .then((res) => (res.data));
+  },
+
+  register(payload: RegisterPayload) {
+    return publicApi
+      .post<AuthResponse>("/auth/register", payload)
+      .then((res) => res.data);
   },
 
   refresh() {

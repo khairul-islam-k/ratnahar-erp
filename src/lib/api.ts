@@ -4,6 +4,25 @@ import { useAuthStore } from "@/app/stores/auth.store";
 
 const baseURL = `${process.env.NEXT_PUBLIC_API_URL}/api/v1`;
 
+export function getApiErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const responseData: unknown = error.response?.data;
+
+    if (responseData && typeof responseData === "object" && "message" in responseData) {
+      const message = responseData.message;
+      if (typeof message === "string") return message;
+    }
+
+    return error.message || "An API error occurred.";
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "An unexpected error occurred.";
+}
+
 export const publicApi = axios.create({
   baseURL,
   headers: {

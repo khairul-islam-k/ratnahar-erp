@@ -3,6 +3,7 @@ export type AuthUser = {
   name: string;
   email: string;
   status: string;
+  type: 'ADMIN' | 'TENANT';
 };
 
 export type AuthResponse = {
@@ -15,6 +16,14 @@ export type AuthResponse = {
 export type LoginPayload = {
   email: string;
   password: string;
+};
+
+// register
+export type RegisterPayload = {
+  name: string;
+  email: string;
+  password: string;
+  businessName: string;
 };
 
 // refresh response

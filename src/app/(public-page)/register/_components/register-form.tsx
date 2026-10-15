@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
+import { authApi } from "@/lib/api/auth";
+import { getApiErrorMessage } from "@/lib/api";
+import { toast } from "@/lib/toast";
 
 type RegisterFormValues = {
   name: string;
@@ -20,6 +24,7 @@ const requiredMark = (
 );
 
 export default function RegisterForm() {
+  const router = useRouter();
   const [message, setMessage] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
@@ -27,14 +32,21 @@ export default function RegisterForm() {
     register,
     handleSubmit,
     getValues,
+    reset,
     formState: { errors },
   } = useForm<RegisterFormValues>();
 
-  const onSubmit: SubmitHandler<RegisterFormValues> = (values) => {
-    // React Hook Form provides all validated field values here for the API call.
-    void values;
-    console.log('values', values);
-    setMessage("Your details are valid. Registration API is not connected yet.");
+  const onSubmit: SubmitHandler<RegisterFormValues> = async ({ confirmPassword: _confirmPassword, ...payload }) => {
+    setMessage("");
+
+    try {
+      await authApi.register(payload);
+      toast.success("Registration successful");
+      reset();
+      router.push("/login");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error));
+    }
   };
 
   const inputClassName =
@@ -200,7 +212,8 @@ export default function RegisterForm() {
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+        className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus-visible:outline-2 cursor-pointer
+        focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
       >
         Create account
       </button>
