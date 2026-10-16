@@ -3,7 +3,10 @@
 import { useGalleryQuery } from "@/lib/api/hooks/gallery";
 
 export default function GalleryPage() {
-  const { data, isPending, isError, error } = useGalleryQuery(1, 10);
+  const { data, isPending, isError, error } = useGalleryQuery({
+    limit: 5,
+    page: 1
+  });
 
   if (isPending) return <p>Loading gallery...</p>;
   if (isError) return <p role="alert">{error.message}</p>;
