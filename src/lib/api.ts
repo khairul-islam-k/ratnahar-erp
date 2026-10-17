@@ -49,9 +49,6 @@ refreshApi.interceptors.request.use((config) => {
 
 export const api = axios.create({
   baseURL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 api.interceptors.request.use((config) => {

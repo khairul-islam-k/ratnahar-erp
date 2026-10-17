@@ -1,7 +1,7 @@
 "use client";
 
 import { Mutation, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { galleryApi } from "../gallery";
+import { galleryApi, type BulkDeleteGalleryPayload } from "../gallery";
 import { queryKeys } from "../query-keys";
 import type { QueryType } from "../../../../types/gallery";
 
@@ -24,7 +24,10 @@ export function useGalleryMutation() {
       mutationFn: (files: File[]) => galleryApi.bulkUpload(files),
       onSuccess: invalidate,
     }),
-
+     bulkDelete: useMutation({
+      mutationFn: (payload: BulkDeleteGalleryPayload) => galleryApi.bulkDelete(payload),
+      onSuccess: invalidate,
+    }),
 
   };
 }

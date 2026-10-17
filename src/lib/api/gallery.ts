@@ -2,6 +2,10 @@ import type { GalleryItem, QueryType } from "../../../types/gallery";
 import { buildQuery, type PaginatedResponse } from "./response";
 import { api } from "../api";
 
+export type BulkDeleteGalleryPayload = {
+  ids: string[];
+};
+
 export const galleryApi = {
   list(query?: QueryType) {
     return api
@@ -11,12 +15,16 @@ export const galleryApi = {
 
   bulkUpload(files: File[]) {
     const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
+    files.forEach((file) => formData.append("images", file));
 
     return api
-      .post<GalleryItem[]>("/gallery/bulk", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
+      .post<GalleryItem[]>("/gallery/bulk", formData)
+      .then((res) => res.data);
+  },
+
+  bulkDelete(payload: BulkDeleteGalleryPayload) {
+    return api
+      .delete("/gallery/bulk", { data: payload })
       .then((res) => res.data);
   },
 
@@ -25,9 +33,8 @@ export const galleryApi = {
     formData.append("file", file);
 
     return api
-      .post<GalleryItem>("/gallery", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-      .then((res) => res.data);
+      .post<GalleryItem>("/gallery", formData)
+      .then((res) => res.data)
+      .catch(err => console.log('err', err))
   },
 };
