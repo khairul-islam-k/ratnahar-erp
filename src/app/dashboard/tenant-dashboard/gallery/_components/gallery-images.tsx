@@ -5,12 +5,23 @@ import { getApiErrorMessage } from "@/lib/api";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Check, Trash2 } from "lucide-react";
+import { Check, Copy, Trash2 } from "lucide-react";
+import { Pagination } from "@/components/shared/pagination";
 
 const GalleryImages = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const { data, isPending, isError, error } = useGalleryQuery({ limit: 5, page: 1 });
   const { bulkDelete } = useGalleryMutation();
+
+  // pagination
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const limit = 12;
+
+  const { data, isPending, isError, error } = useGalleryQuery({
+     limit,
+     page: currentPage });
+
+  const total = data?.meta.total ?? 0;
+
   const images = data?.data ?? [];
   const allSelected = images.length > 0 && images.every((image) => selectedIds.includes(image.id));
 
@@ -26,10 +37,45 @@ const GalleryImages = () => {
     setSelectedIds(checked ? images.map((image) => image.id) : []);
   }
 
+  async function copyImageLink(url: string | null) {
+    if (!url) {
+      toast.error("Image link is unavailable");
+      return;
+    }
+
+    const absoluteUrl = new URL(url, window.location.origin).href;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(absoluteUrl);
+      } else if (!copyWithFallback(absoluteUrl)) {
+        throw new Error("Clipboard is unavailable");
+      }
+      toast.success("Image link copied");
+    } catch {
+      if (copyWithFallback(absoluteUrl)) {
+        toast.success("Image link copied");
+      } else {
+        toast.error("Could not copy image link");
+      }
+    }
+  }
+
+  function copyWithFallback(value: string) {
+    const input = document.createElement("textarea");
+    input.value = value;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.opacity = "0";
+    document.body.appendChild(input);
+    input.select();
+    const copied = document.execCommand("copy");
+    document.body.removeChild(input);
+    return copied;
+  }
+
   async function deleteSelectedImages() {
     if (!selectedIds.length || bulkDelete.isPending) return;
-
-    console.log('selectId', selectedIds);
 
     try {
       const count = selectedIds.length;
@@ -110,11 +156,32 @@ const GalleryImages = () => {
                 </span>
               )}
             </button>
-            {image.title && <figcaption className="truncate p-2 text-sm">{image.title}</figcaption>}
+            <figcaption className="flex items-center justify-between gap-2 p-2">
+              <span className="truncate text-sm">{image.title || "Untitled image"}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => copyImageLink(src)}
+                disabled={!src}
+                aria-label={`Copy link for ${image.title || "gallery image"}`}
+                title="Copy image link"
+                className="cursor-pointer"
+              >
+                <Copy aria-hidden="true" />
+              </Button>
+            </figcaption>
           </figure>
         );
       })}
       </div>
+
+      <Pagination
+        page={currentPage}
+        total={total}
+        limit={limit}
+        onPageChange={setCurrentPage}
+      />
     </div>
   )
 }
