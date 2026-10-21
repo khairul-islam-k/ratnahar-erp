@@ -30,11 +30,13 @@ export const galleryApi = {
 
   upload(file: File) {
     const formData = new FormData();
-    formData.append("file", file);
+    const title = file.name.replace(/\.[^.]+$/, "").slice(0, 200) || "Uploaded image";
+    formData.append("title", title);
+    formData.append("altText", title.slice(0, 255));
+    formData.append("image", file);
 
     return api
       .post<GalleryItem>("/gallery", formData)
-      .then((res) => res.data)
-      .catch(err => console.log('err', err))
+      .then((res) => res.data);
   },
 };

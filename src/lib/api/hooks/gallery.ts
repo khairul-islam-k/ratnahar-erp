@@ -24,6 +24,10 @@ export function useGalleryMutation() {
       mutationFn: (files: File[]) => galleryApi.bulkUpload(files),
       onSuccess: invalidate,
     }),
+     uploadImage: useMutation({
+      mutationFn: (file: File) => galleryApi.upload(file),
+      onSuccess: invalidate,
+    }),
      bulkDelete: useMutation({
       mutationFn: (payload: BulkDeleteGalleryPayload) => galleryApi.bulkDelete(payload),
       onSuccess: invalidate,

@@ -105,11 +105,12 @@ const GalleryImages = () => {
             checked={allSelected}
             onChange={(event) => toggleAllSelection(event.currentTarget.checked)}
             aria-label="Select all images"
-            className="size-4 accent-primary"
+            className="size-4 accent-primary cursor-pointer"
           />
           <span>{selectedIds.length ? `${selectedIds.length} selected` : "Select all"}</span>
         </label>
         <Button
+          className="cursor-pointer"
           type="button"
           variant="destructive"
           size="sm"

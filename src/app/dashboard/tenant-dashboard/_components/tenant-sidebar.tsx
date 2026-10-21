@@ -3,18 +3,6 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  LayoutDashboard,
-  Users,
-  ShoppingCart,
-  Package,
-  Settings,
-  ChevronRight,
-  ChevronsUpDown,
-  LogOut,
-  User,
-  Store,
-} from "lucide-react"
 
 import {
   Sidebar,
@@ -45,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Boxes, Briefcase, ChevronRight, ChevronsUpDown, CircleCheck, ClipboardList, Clock, Images, LayoutDashboard, LogOut, Package, PackagePlus, Settings, ShieldCheck, ShoppingCart, Store, Tags, Undo2, User, UserCog, Users, Warehouse } from "lucide-react"
 
 type NavItem = {
   title: string
@@ -54,10 +43,23 @@ type NavItem = {
 }
 
 const mainItems: NavItem[] = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Gallery", 
+  { title: "Dashboard", url: "/dashboard/tenant-dashboard", icon: LayoutDashboard },
+  {
+    title: "Gallery",
     url: "/dashboard/tenant-dashboard/gallery",
-    icon: LayoutDashboard },
+    icon: Images,
+  },
+  {
+    title: "Employees",
+    url: "/employees",
+    icon: Briefcase,
+    children: [
+      {
+        title: "All Employees",
+        url: "/dashboard/tenant-dashboard/employees"
+      },
+    ],
+  },
   {
     title: "Orders",
     url: "/orders",
@@ -83,13 +85,13 @@ const mainItems: NavItem[] = [
   {
     title: "Users",
     url: "/users",
-    icon: Users,
+    icon: UserCog,
     children: [
       { title: "All Users", url: "/users" },
       { title: "Roles", url: "/users/roles" },
     ],
   },
-]
+];
 
 const systemItems: NavItem[] = [
   {
