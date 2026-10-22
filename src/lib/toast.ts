@@ -9,9 +9,16 @@ export type ToastMessage = ToastOptions & {
   id: number;
   variant: ToastVariant;
   message: string;
+  confirmation?: {
+    confirmLabel: string;
+    cancelLabel: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+  };
 };
 
 export const TOAST_EVENT = "app-toast";
+export const TOAST_CONFIRM_EVENT = "app-toast-confirm";
 
 let nextToastId = 0;
 
@@ -37,4 +44,29 @@ export const toast = {
 
   warning: (message: string, options?: ToastOptions) => showToast("warning", message, options),
   
+  confirm: (
+    message: string,
+    options: ToastOptions & { confirmLabel?: string; cancelLabel?: string } = {},
+  ): Promise<boolean> => {
+    if (typeof window === "undefined") return Promise.resolve(false);
+
+    return new Promise((resolve) => {
+      const { confirmLabel = "Confirm", cancelLabel = "Cancel", ...toastOptions } = options;
+      const toast: ToastMessage = {
+        id: ++nextToastId,
+        variant: "warning",
+        message,
+        ...toastOptions,
+        duration: options.duration ?? 0,
+        confirmation: {
+          confirmLabel,
+          cancelLabel,
+          onConfirm: () => resolve(true),
+          onCancel: () => resolve(false),
+        },
+      };
+
+      window.dispatchEvent(new CustomEvent<ToastMessage>(TOAST_CONFIRM_EVENT, { detail: toast }));
+    });
+  },
 };

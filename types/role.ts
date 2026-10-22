@@ -18,6 +18,20 @@ export interface RoleListResponse {
   message: string;
 }
 
+export interface CreateRolePayload {
+  name: string;
+  slug: string;
+  description: string;
+  isSystemRole: boolean;
+}
+
+export type UpdateRolePayload = Partial<CreateRolePayload>;
+
 export type RoleQuery = QueryType & {
   search?: string;
 }
+
+export type AssignRolePermissionPayload = {
+  roleId: string;
+  permissionId: string;
+};

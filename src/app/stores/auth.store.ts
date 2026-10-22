@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   refresh: async () => {
     const { accessToken, refreshToken } = await authApi.refresh();
-    console.log('refres', refreshToken);
+    
     Cookies.set(ACCESS_TOKEN, accessToken, cookieOptions);
     Cookies.set(REFRESH_TOKEN, refreshToken, cookieOptions);
     set({ accessToken, refreshToken });

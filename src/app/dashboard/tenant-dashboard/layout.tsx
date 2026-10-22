@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 import { TenantSidebar } from "./_components/tenant-sidebar"
@@ -5,7 +6,9 @@ import { TenantSidebar } from "./_components/tenant-sidebar"
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <TenantSidebar />
+      <Suspense fallback={<div className="w-16" aria-hidden="true" />}>
+        <TenantSidebar />
+      </Suspense>
       <SidebarInset>
         <header className="flex h-14 items-center gap-2 border-b px-4">
           <SidebarTrigger />

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Check, Info, TriangleAlert, X, XCircle } from "lucide-react";
-import { TOAST_EVENT, type ToastMessage, type ToastVariant } from "@/lib/toast";
+import { TOAST_CONFIRM_EVENT, TOAST_EVENT, type ToastMessage, type ToastVariant } from "@/lib/toast";
 
 const variantStyles: Record<ToastVariant, { icon: typeof Check; className: string }> = {
   success: { icon: Check, className: "border-emerald-200 bg-emerald-50 text-emerald-950" },
@@ -27,12 +27,19 @@ export function Toaster() {
     const addToast = (event: Event) => {
       const message = (event as CustomEvent<ToastMessage>).detail;
       setMessages((current) => [...current, message]);
-      timers.set(message.id, setTimeout(() => removeToast(message.id), message.duration ?? 4500));
+      if (message.duration !== 0) {
+        timers.set(message.id, setTimeout(() => {
+          message.confirmation?.onCancel();
+          removeToast(message.id);
+        }, message.duration ?? 4500));
+      }
     };
 
     window.addEventListener(TOAST_EVENT, addToast);
+    window.addEventListener(TOAST_CONFIRM_EVENT, addToast);
     return () => {
       window.removeEventListener(TOAST_EVENT, addToast);
+      window.removeEventListener(TOAST_CONFIRM_EVENT, addToast);
       timers.forEach(clearTimeout);
     };
   }, []);
@@ -55,10 +62,37 @@ export function Toaster() {
                 <p className="mt-1 text-sm opacity-80">{message.description}</p>
               )}
             </div>
+            {message.confirmation && (
+              <div className="flex shrink-0 gap-2 self-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    message.confirmation?.onCancel();
+                    removeToast(message.id);
+                  }}
+                  className="rounded-md px-2 py-1 text-xs font-medium hover:bg-black/5 focus-visible:outline-2"
+                >
+                  {message.confirmation.cancelLabel}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    message.confirmation?.onConfirm();
+                    removeToast(message.id);
+                  }}
+                  className="rounded-md bg-black/10 px-2 py-1 text-xs font-semibold hover:bg-black/15 focus-visible:outline-2"
+                >
+                  {message.confirmation.confirmLabel}
+                </button>
+              </div>
+            )}
             <button
               type="button"
               aria-label="Dismiss notification"
-              onClick={() => setMessages((current) => current.filter((item) => item.id !== message.id))}
+              onClick={() => {
+                message.confirmation?.onCancel();
+                removeToast(message.id);
+              }}
               className="-mr-1 -mt-1 rounded-md p-1 opacity-70 transition hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               <X aria-hidden="true" className="size-4" />

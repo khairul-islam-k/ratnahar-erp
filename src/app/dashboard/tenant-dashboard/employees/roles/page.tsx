@@ -1,14 +1,23 @@
 "use client"
 
 import { DynamicTable, type DynamicTableColumn } from "@/components/shared/dynamic-table"
-import { useRoleQuery } from "@/lib/api/hooks/role"
+import { useRoleMutation, useRoleQuery } from "@/lib/api/hooks/role"
 import type { RoleResponse } from "../../../../../../types/role"
 import { useState } from "react"
-import { Search } from "lucide-react"
+import { Search, MoreHorizontal, Pencil, ShieldCheck, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useDebounce } from "use-debounce"
+import { getApiErrorMessage } from "@/lib/api"
+import { toast } from "@/lib/toast"
+import Link from "next/link"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const RolePage = () => {
   const [page, setPage] = useState(1)
@@ -20,11 +29,65 @@ const RolePage = () => {
     limit,
     search: searchValue,
   })
+  const { delete: deleteRole } = useRoleMutation()
+
+  const handleDelete = async (role: RoleResponse) => {
+    const confirmed = await toast.confirm(`Delete the role "${role.name}"?`, {
+      description: "This action cannot be undone.",
+      confirmLabel: "Delete",
+      cancelLabel: "Keep role",
+    })
+    if (!confirmed) return
+
+    try {
+      await deleteRole.mutateAsync(role.id)
+      toast.success("Role deleted successfully")
+    } catch (deleteError) {
+      toast.error(getApiErrorMessage(deleteError))
+    }
+  }
+
   const columns: DynamicTableColumn<RoleResponse>[] = [
     { key: "name", header: "Role" },
     { key: "slug", header: "Slug" },
     { key: "description", header: "Description", render: (value) => value || "—" },
     { key: "isSystemRole", header: "System role", render: (value) => value ? "Yes" : "No" },
+    {
+      key: "id",
+      header: "Actions",
+      render: (_value, role) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            aria-label={`Actions for ${role.name}`}
+            className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+          >
+            <MoreHorizontal className="size-4" aria-hidden="true" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem
+            className="cursor-pointer"
+            render={<Link href={`/dashboard/tenant-dashboard/employees/roles/edit/${role.id}`} />}>
+              <Pencil aria-hidden="true" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+            className="cursor-pointer"
+            render={<Link href={`/dashboard/tenant-dashboard/employees/roles/permission/${role.id}`} />}>
+              <ShieldCheck aria-hidden="true" />
+              Assign Permission
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              disabled={deleteRole.isPending}
+              onClick={() => void handleDelete(role)}
+            >
+              <Trash2 aria-hidden="true" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
   ]
 
   return (
@@ -62,10 +125,12 @@ const RolePage = () => {
                 />
               </div>
               <div className="sm:ml-auto">
-                <Button className="cursor-pointer">
-                  <Plus aria-hidden="true" />
-                  Create role
-                </Button>
+                <Link href="/dashboard/tenant-dashboard/employees/roles/create">
+                  <Button className="cursor-pointer">
+                    <Plus aria-hidden="true" />
+                    Create role
+                  </Button>
+                </Link>
               </div>
             </div>
           )}
