@@ -33,7 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Boxes, Briefcase, ChevronRight, ChevronsUpDown, CircleCheck, ClipboardList, Clock, Images, LayoutDashboard, LogOut, Package, PackagePlus, Settings, ShieldCheck, ShoppingCart, Store, Tags, Undo2, User, UserCog, Users, Warehouse } from "lucide-react"
+import { Briefcase, ChevronRight, ChevronsUpDown,  Images, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Store, User, UserCog } from "lucide-react"
 
 type NavItem = {
   title: string
@@ -57,6 +57,10 @@ const mainItems: NavItem[] = [
       {
         title: "All Employees",
         url: "/dashboard/tenant-dashboard/employees"
+      },
+      {
+        title: "Roles",
+        url: "/dashboard/tenant-dashboard/employees/roles"
       },
     ],
   },
