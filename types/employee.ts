@@ -6,6 +6,14 @@ export type UserStatus =
 |'INACTIVE'
 |'SUSPENDED';
 
+export interface EmployeeRole {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  isSystemRole: boolean;
+}
+
 export interface UserResponse {
   id: string;
   name: string;
@@ -14,6 +22,7 @@ export interface UserResponse {
   type: UserType;
   status: UserStatus;
   photo: string;
+  roles: EmployeeRole | null;
   tenantId: string;
   createdAt: string; // ISO 8601 date string
   updatedAt: string; // ISO 8601 date string
@@ -26,6 +35,8 @@ export type CreateEmployeePayload = {
   phone: string;
   photo?: string;
 };
+
+export type UpdateEmployeePayload = Partial<CreateEmployeePayload>;
 
 export type EmployeeQuery = QueryType & {
   search?: string;

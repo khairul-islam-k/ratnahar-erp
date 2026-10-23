@@ -1,5 +1,5 @@
 import { AuthResponse, LoginPayload, RefreshResponse, RegisterPayload } from "../../../types/auth";
-import { publicApi, refreshApi } from "../api";
+import { api, publicApi, refreshApi } from "../api";
 
 export const authApi = {
   login(payload: LoginPayload) {
@@ -18,5 +18,11 @@ export const authApi = {
     return refreshApi
       .post<RefreshResponse>("/auth/refresh")
       .then((res) => (res.data))
+  },
+
+  logout() {
+    return api
+      .post("/auth/logout")
+      .then((res) => res.data);
   },
 };

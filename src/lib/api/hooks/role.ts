@@ -55,10 +55,15 @@ export function useRoleMutation() {
         userId,
         payload
       }: {
-        userId: string,
+        userId: string;
         payload: AssignRoleToUserPayload,
       }) => roleApi.assignRoleToUser(payload, userId),
-      onSuccess: invalidate,
+      onSuccess: async () => {
+        await Promise.all([
+          invalidate(),
+          queryClient.invalidateQueries({ queryKey: queryKeys.employee.all }),
+        ]);
+      },
     }),
   };
 }

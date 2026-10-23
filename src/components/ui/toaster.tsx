@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Info, TriangleAlert, X, XCircle } from "lucide-react";
 import { TOAST_CONFIRM_EVENT, TOAST_EVENT, type ToastMessage, type ToastVariant } from "@/lib/toast";
 
@@ -13,22 +13,21 @@ const variantStyles: Record<ToastVariant, { icon: typeof Check; className: strin
 
 export function Toaster() {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
+  const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+
+  const removeToast = useCallback((id: number) => {
+    const timer = timers.current.get(id);
+    if (timer) clearTimeout(timer);
+    timers.current.delete(id);
+    setMessages((current) => current.filter((item) => item.id !== id));
+  }, []);
 
   useEffect(() => {
-    const timers = new Map<number, ReturnType<typeof setTimeout>>();
-
-    const removeToast = (id: number) => {
-      const timer = timers.get(id);
-      if (timer) clearTimeout(timer);
-      timers.delete(id);
-      setMessages((current) => current.filter((item) => item.id !== id));
-    };
-
     const addToast = (event: Event) => {
       const message = (event as CustomEvent<ToastMessage>).detail;
       setMessages((current) => [...current, message]);
       if (message.duration !== 0) {
-        timers.set(message.id, setTimeout(() => {
+        timers.current.set(message.id, setTimeout(() => {
           message.confirmation?.onCancel();
           removeToast(message.id);
         }, message.duration ?? 4500));
@@ -40,9 +39,10 @@ export function Toaster() {
     return () => {
       window.removeEventListener(TOAST_EVENT, addToast);
       window.removeEventListener(TOAST_CONFIRM_EVENT, addToast);
-      timers.forEach(clearTimeout);
+      timers.current.forEach(clearTimeout);
+      timers.current.clear();
     };
-  }, []);
+  }, [removeToast]);
 
   return (
     <div className="pointer-events-none fixed right-4 top-4 z-[100] flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3">
@@ -70,7 +70,7 @@ export function Toaster() {
                     message.confirmation?.onCancel();
                     removeToast(message.id);
                   }}
-                  className="rounded-md px-2 py-1 text-xs font-medium hover:bg-black/5 focus-visible:outline-2"
+                  className="cursor-pointer rounded-md px-2 py-1 text-xs font-medium hover:bg-black/5 focus-visible:outline-2"
                 >
                   {message.confirmation.cancelLabel}
                 </button>
@@ -80,7 +80,7 @@ export function Toaster() {
                     message.confirmation?.onConfirm();
                     removeToast(message.id);
                   }}
-                  className="rounded-md bg-black/10 px-2 py-1 text-xs font-semibold hover:bg-black/15 focus-visible:outline-2"
+                  className="cursor-pointer rounded-md bg-black/10 px-2 py-1 text-xs font-semibold hover:bg-black/15 focus-visible:outline-2"
                 >
                   {message.confirmation.confirmLabel}
                 </button>
@@ -93,7 +93,7 @@ export function Toaster() {
                 message.confirmation?.onCancel();
                 removeToast(message.id);
               }}
-              className="-mr-1 -mt-1 rounded-md p-1 opacity-70 transition hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="-mr-1 -mt-1 cursor-pointer rounded-md p-1 opacity-70 transition hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               <X aria-hidden="true" className="size-4" />
             </button>

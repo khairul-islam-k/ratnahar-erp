@@ -69,6 +69,7 @@ export default function EmployeesPage() {
             confirmLabel: "Delete",
             cancelLabel: "Cancel",
         })
+        console.log('cs', confirmed);
         if (!confirmed) return
         try {
             await deleteEmployee.mutateAsync(employee.id)
@@ -114,7 +115,13 @@ export default function EmployeesPage() {
         { key: "name", header: "Name" },
         { key: "email", header: "Email" },
         { key: "phone", header: "Phone" },
-        { key: "type", header: "Type" },
+        {
+            key: "roles",
+            header: "Role Name",
+            render: (_value, employee) => (
+                <span>{employee.roles?.name ?? "No role assigned"}</span>
+            ),
+        },
         {
             key: "status",
             header: "Status",
@@ -139,12 +146,12 @@ export default function EmployeesPage() {
                 <DropdownMenu>
                     <DropdownMenuTrigger
                         aria-label={`Actions for ${employee.name}`}
-                        className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
                     >
                         <MoreHorizontal className="size-4" aria-hidden="true" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem className="cursor-pointer" render={<Link href={`/dashboard/tenant-dashboard/employees/edit/${employee.id}`} />}>
+                        <DropdownMenuItem className="cursor-pointer" render={<Link href={`/dashboard/tenant-dashboard/employees/update/${employee.id}`} />}>
                             <Pencil aria-hidden="true" />
                             Edit
                         </DropdownMenuItem>
@@ -210,6 +217,7 @@ export default function EmployeesPage() {
                                     type="button"
                                     disabled={!selectedRoleId || assignRoleToUser.isPending}
                                     onClick={() => void handleAssignRole()}
+                                    className="cursor-pointer"
                                 >
                                     {assignRoleToUser.isPending ? "Assigning..." : "Assign role"}
                                 </Button>

@@ -11,6 +11,7 @@ export const queryKeys = {
   employee: {
     all: ["employee"] as const,
     list: (query?: EmployeeQuery) => ["employee", "list", query] as const,
+    detail: (id: string) => ["employee", "detail", id] as const,
   },
   role: {
     all: ["role"] as const,

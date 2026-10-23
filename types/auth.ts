@@ -4,6 +4,7 @@ export type AuthUser = {
   email: string;
   status: string;
   type: 'ADMIN' | 'TENANT';
+  photo?: string | null;
 };
 
 export type AuthResponse = {
