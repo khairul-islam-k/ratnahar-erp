@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { AssignRolePermissionPayload, CreateRolePayload, RoleQuery, UpdateRolePayload } from "../../../../types/role";
+import type { AssignRolePermissionPayload, AssignRoleToUserPayload, CreateRolePayload, RoleQuery, UpdateRolePayload } from "../../../../types/role";
 import { roleApi } from "../role";
 import { queryKeys } from "../query-keys";
 
@@ -30,7 +30,6 @@ export function useRolePermissionsQuery(roleId: string) {
 
 export function useRoleMutation() {
   const queryClient = useQueryClient();
-
   const invalidate = () => queryClient.invalidateQueries({ queryKey: queryKeys.role.all })
 
   return {
@@ -48,7 +47,17 @@ export function useRoleMutation() {
       onSuccess: invalidate,
     }),
     assignPermissions: useMutation({
-      mutationFn: (payload: AssignRolePermissionPayload[]) => roleApi.assignPermissions(payload),
+      mutationFn: (payload: AssignRolePermissionPayload) => roleApi.assignPermissions(payload),
+      onSuccess: invalidate,
+    }),
+    assignRoleToUser: useMutation({
+      mutationFn: ({
+        userId,
+        payload
+      }: {
+        userId: string,
+        payload: AssignRoleToUserPayload,
+      }) => roleApi.assignRoleToUser(payload, userId),
       onSuccess: invalidate,
     }),
   };

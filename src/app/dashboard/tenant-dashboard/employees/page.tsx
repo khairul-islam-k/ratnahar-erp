@@ -5,19 +5,27 @@ import { DynamicTable, type DynamicTableColumn } from "@/components/shared/dynam
 import type { UserResponse, UserStatus } from "../../../../../types/employee"
 import { useState } from "react"
 import Link from "next/link"
-import { Plus, Search } from "lucide-react"
+import { MoreHorizontal, Pencil, Plus, Search, Shield, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getImageUrl } from "@/lib/image-url"
 import Image from "next/image"
 import { getApiErrorMessage } from "@/lib/api"
 import { toast } from "@/lib/toast"
+import { useRoleMutation, useRoleQuery } from "@/lib/api/hooks/role"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 export default function EmployeesPage() {
     const [page, setPage] = useState(1)
     const [search, setSearch] = useState("")
     const [status, setStatus] = useState<UserStatus | "">("")
-    const { updateStatus } = useEmployeeMutation()
+    const { updateStatus, delete: deleteEmployee } = useEmployeeMutation()
     const limit = 5
     const { data, isPending, isError, error } = useEmployeeQuery({
         page,
@@ -25,6 +33,14 @@ export default function EmployeesPage() {
         search: search || undefined,
         status: status || undefined,
     })
+
+    const { assignRoleToUser } = useRoleMutation()
+    const rolesQuery = useRoleQuery({
+        page: 1,
+        limit: 100,
+    })
+    const [employeeForRole, setEmployeeForRole] = useState<UserResponse | null>(null)
+    const [selectedRoleId, setSelectedRoleId] = useState("")
 
     const handleSearchChange = (value: string) => {
         setSearch(value)
@@ -42,6 +58,36 @@ export default function EmployeesPage() {
         try {
             await updateStatus.mutateAsync({ id, status: nextStatus })
             toast.success("Employee status updated successfully")
+        } catch (error) {
+            toast.error(getApiErrorMessage(error))
+        }
+    }
+
+    const handleDelete = async (employee: UserResponse) => {
+        const confirmed = await toast.confirm(`Delete employee "${employee.name}"?`, {
+            description: "This action cannot be undone.",
+            confirmLabel: "Delete",
+            cancelLabel: "Cancel",
+        })
+        if (!confirmed) return
+        try {
+            await deleteEmployee.mutateAsync(employee.id)
+            toast.success("Employee deleted successfully")
+        } catch (error) {
+            toast.error(getApiErrorMessage(error))
+        }
+    }
+
+    const handleAssignRole = async () => {
+        if (!employeeForRole || !selectedRoleId) return
+        try {
+            await assignRoleToUser.mutateAsync({
+                userId: employeeForRole.id,
+                payload: { roleId: selectedRoleId },
+            })
+            toast.success("Role assigned to employee successfully")
+            setEmployeeForRole(null)
+            setSelectedRoleId("")
         } catch (error) {
             toast.error(getApiErrorMessage(error))
         }
@@ -85,7 +131,46 @@ export default function EmployeesPage() {
                     <option value="SUSPENDED">SUSPENDED</option>
                 </select>
             ),
-        }
+        },
+        {
+            key: "id",
+            header: "Actions",
+            render: (_value, employee) => (
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        aria-label={`Actions for ${employee.name}`}
+                        className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                        <MoreHorizontal className="size-4" aria-hidden="true" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem className="cursor-pointer" render={<Link href={`/dashboard/tenant-dashboard/employees/edit/${employee.id}`} />}>
+                            <Pencil aria-hidden="true" />
+                            Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => {
+                                setEmployeeForRole(employee)
+                                setSelectedRoleId("")
+                            }}
+                        >
+                            <Shield aria-hidden="true" />
+                            Assign to role
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            variant="destructive"
+                            className="cursor-pointer"
+                            disabled={deleteEmployee.isPending}
+                            onClick={() => void handleDelete(employee)}
+                        >
+                            <Trash2 aria-hidden="true" />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ),
+        },
 
     ]
 
@@ -97,6 +182,42 @@ export default function EmployeesPage() {
                     View and manage your employees.
                 </p>
             </div>
+
+            <Dialog open={Boolean(employeeForRole)} onOpenChange={(open) => !open && setEmployeeForRole(null)}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Assign role</DialogTitle>
+                        <DialogDescription>Select a role for {employeeForRole?.name}.</DialogDescription>
+                    </DialogHeader>
+                    {rolesQuery.isError ? (
+                        <p className="text-sm text-destructive">Could not load roles: {rolesQuery.error.message}</p>
+                    ) : (
+                        <div className="space-y-4">
+                            <select
+                                value={selectedRoleId}
+                                onChange={(event) => setSelectedRoleId(event.target.value)}
+                                disabled={rolesQuery.isPending}
+                                aria-label="Select role"
+                                className="h-9 w-full rounded-lg border border-input bg-background px-2.5 text-sm"
+                            >
+                                <option value="">{rolesQuery.isPending ? "Loading roles..." : "Select a role"}</option>
+                                {rolesQuery.data?.data.map((role) => (
+                                    <option key={role.id} value={role.id}>{role.name}</option>
+                                ))}
+                            </select>
+                            <div className="flex justify-end">
+                                <Button
+                                    type="button"
+                                    disabled={!selectedRoleId || assignRoleToUser.isPending}
+                                    onClick={() => void handleAssignRole()}
+                                >
+                                    {assignRoleToUser.isPending ? "Assigning..." : "Assign role"}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
 
             {isPending ? (
                 <p className="text-sm text-muted-foreground">Loading employees...</p>

@@ -27,15 +27,23 @@ export interface CreateRolePayload {
 
 export type UpdateRolePayload = Partial<CreateRolePayload>;
 
+export type AssignRoleToUserPayload = {
+  roleId: string;
+};
+
 export type RoleQuery = QueryType & {
   search?: string;
 }
 
 export type AssignRolePermissionPayload = {
   roleId: string;
-  permissionId: string;
+  data: {
+    permissionId: string;
+  }[];
 };
 
-export type RolePermission = AssignRolePermissionPayload & {
+export type RolePermission = {
+  roleId: string;
+  permissionId: string;
   id: string;
 };

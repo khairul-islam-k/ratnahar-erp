@@ -1,14 +1,16 @@
 "use client"
 
 import { Suspense, useEffect, useState, type FormEvent } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
+import Link from "next/link"
 import { useRoleMutation, useRolePermissionsQuery } from "@/lib/api/hooks/role"
 import { getApiErrorMessage } from "@/lib/api"
 import { toast } from "@/lib/toast"
 import { usePermissionQuery } from "@/lib/api/hooks/permission"
-import { Button } from "@base-ui/react"
+import { Button } from "@/components/ui/button"
 
 function AssignPermissionContent() {
+  const router = useRouter();
   const { id } = useParams<{ id: string }>()
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([])
   const { assignPermissions } = useRoleMutation()
@@ -30,11 +32,13 @@ function AssignPermissionContent() {
     event.preventDefault()
     if (selectedPermissionIds.length === 0) return
 
-    const payload = selectedPermissionIds.map((permissionId) => ({ roleId: id, permissionId }));
+    const payload = {
+      roleId: id,
+      data: selectedPermissionIds.map((permissionId) => ({ permissionId })),
+    };
     try {
       await assignPermissions.mutateAsync(payload)
       toast.success("Permissions assigned to role successfully")
-      setSelectedPermissionIds([])
     } catch (error) {
       toast.error(getApiErrorMessage(error))
     }
@@ -84,9 +88,16 @@ function AssignPermissionContent() {
               </fieldset>
             ))}
           </div>
-          <Button type="submit" disabled={assignPermissions.isPending || selectedPermissionIds.length === 0}>
-            {assignPermissions.isPending ? "Assigning..." : "Assign selected permissions"}
-          </Button>
+          <div className="flex justify-end gap-2">
+            <Button
+            onClick={router.back}
+             type="button" variant="outline">
+              Back
+            </Button>
+            <Button type="submit" disabled={assignPermissions.isPending || selectedPermissionIds.length === 0}>
+              {assignPermissions.isPending ? "Assigning..." : "Assign selected permissions"}
+            </Button>
+          </div>
         </form>
       )}
     </section>

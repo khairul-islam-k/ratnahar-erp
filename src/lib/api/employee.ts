@@ -15,6 +15,12 @@ export const employeeApi = {
       .then((res) => res.data);
   },
 
+  delete(id: string) {
+    return api
+      .delete(`/employee/${id}`)
+      .then((res) => res.data);
+  },
+
   list(query?: EmployeeQuery) {
     return api
       .get<PaginatedResponse<UserResponse>>(`/employee${buildQuery(query)}`)

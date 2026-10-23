@@ -1,4 +1,4 @@
-import type { AssignRolePermissionPayload, CreateRolePayload, RoleListResponse, RolePermission, RoleQuery, RoleResponse, UpdateRolePayload } from "../../../types/role";
+import type { AssignRolePermissionPayload, AssignRoleToUserPayload, CreateRolePayload, RoleListResponse, RolePermission, RoleQuery, RoleResponse, UpdateRolePayload } from "../../../types/role";
 import { api } from "../api";
 import { ApiResponse, buildQuery } from "./response";
 
@@ -39,9 +39,15 @@ export const roleApi = {
       .then((res) => res.data);
   },
 
-  assignPermissions(payload: AssignRolePermissionPayload[]) {
+  assignPermissions(payload: AssignRolePermissionPayload) {
     return api
       .post("/roles/permissions", payload)
+      .then((res) => res.data);
+  },
+
+  assignRoleToUser(payload: AssignRoleToUserPayload, userId: string) {
+    return api
+      .post(`/roles/users/${userId}`, payload)
       .then((res) => res.data);
   },
 };

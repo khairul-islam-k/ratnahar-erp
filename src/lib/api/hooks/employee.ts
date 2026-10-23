@@ -27,5 +27,9 @@ export function useEmployeeMutation() {
         employeeApi.updateStatus(id, status),
       onSuccess: invalidate,
     }),
+    delete: useMutation({
+      mutationFn: (id: string) => employeeApi.delete(id),
+      onSuccess: invalidate,
+    }),
   };
 }
