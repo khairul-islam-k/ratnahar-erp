@@ -1,8 +1,8 @@
 "use client"
 
-import { Suspense, useState, type FormEvent } from "react"
+import { Suspense, useEffect, useState, type FormEvent } from "react"
 import { useParams } from "next/navigation"
-import { useRoleMutation } from "@/lib/api/hooks/role"
+import { useRoleMutation, useRolePermissionsQuery } from "@/lib/api/hooks/role"
 import { getApiErrorMessage } from "@/lib/api"
 import { toast } from "@/lib/toast"
 import { usePermissionQuery } from "@/lib/api/hooks/permission"
@@ -12,7 +12,13 @@ function AssignPermissionContent() {
   const { id } = useParams<{ id: string }>()
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([])
   const { assignPermissions } = useRoleMutation()
+  const rolePermissionsQuery = useRolePermissionsQuery(id)
   const permissionsQuery = usePermissionQuery()
+  useEffect(() => {
+    if (rolePermissionsQuery.data) {
+      setSelectedPermissionIds(rolePermissionsQuery.data.data.map(({ permissionId }) => permissionId))
+    }
+  }, [rolePermissionsQuery.data])
   const permissions = permissionsQuery.data?.data ?? []
   const permissionsByFeature = permissions.reduce<Record<string, typeof permissions>>((groups, permission) => {
     if (!groups[permission.featureKey]) groups[permission.featureKey] = []
@@ -25,17 +31,13 @@ function AssignPermissionContent() {
     if (selectedPermissionIds.length === 0) return
 
     const payload = selectedPermissionIds.map((permissionId) => ({ roleId: id, permissionId }));
-    console.log('payload', payload);
-
-    // try {
-    //   await assignPermissions.mutateAsync(
-    //     selectedPermissionIds.map((permissionId) => ({ roleId: id, permissionId })),
-    //   )
-    //   toast.success("Permissions assigned to role successfully")
-    //   setSelectedPermissionIds([])
-    // } catch (error) {
-    //   toast.error(getApiErrorMessage(error))
-    // }
+    try {
+      await assignPermissions.mutateAsync(payload)
+      toast.success("Permissions assigned to role successfully")
+      setSelectedPermissionIds([])
+    } catch (error) {
+      toast.error(getApiErrorMessage(error))
+    }
   }
 
   return (
@@ -45,8 +47,10 @@ function AssignPermissionContent() {
         <p className="text-sm text-muted-foreground">Choose the permissions to assign to this role.</p>
       </div>
 
-      {permissionsQuery.isPending ? (
+      {rolePermissionsQuery.isPending || permissionsQuery.isPending ? (
         <p className="text-sm text-muted-foreground">Loading permissions...</p>
+      ) : rolePermissionsQuery.isError ? (
+        <p className="text-sm text-destructive">Could not load this role&apos;s permissions: {rolePermissionsQuery.error.message}</p>
       ) : permissionsQuery.isError ? (
         <p className="text-sm text-destructive">Could not load permissions: {permissionsQuery.error.message}</p>
       ) : permissions.length === 0 ? (

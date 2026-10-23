@@ -1,4 +1,4 @@
-import type { AssignRolePermissionPayload, CreateRolePayload, RoleListResponse, RoleQuery, RoleResponse, UpdateRolePayload } from "../../../types/role";
+import type { AssignRolePermissionPayload, CreateRolePayload, RoleListResponse, RolePermission, RoleQuery, RoleResponse, UpdateRolePayload } from "../../../types/role";
 import { api } from "../api";
 import { ApiResponse, buildQuery } from "./response";
 
@@ -24,6 +24,12 @@ export const roleApi = {
   getById(id: string) {
     return api
       .get<ApiResponse<RoleResponse>>(`/roles/${id}`)
+      .then((res) => res.data);
+  },
+
+  getPermissions(roleId: string) {
+    return api
+      .get<ApiResponse<RolePermission[]>>(`/roles/${roleId}/permissions`)
       .then((res) => res.data);
   },
 

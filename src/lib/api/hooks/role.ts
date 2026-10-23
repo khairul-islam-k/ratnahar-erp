@@ -20,6 +20,14 @@ export function useRoleByIdQuery(id: string) {
   });
 }
 
+export function useRolePermissionsQuery(roleId: string) {
+  return useQuery({
+    queryKey: queryKeys.role.permissions(roleId),
+    queryFn: () => roleApi.getPermissions(roleId),
+    enabled: Boolean(roleId),
+  });
+}
+
 export function useRoleMutation() {
   const queryClient = useQueryClient();
 

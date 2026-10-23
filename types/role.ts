@@ -35,3 +35,7 @@ export type AssignRolePermissionPayload = {
   roleId: string;
   permissionId: string;
 };
+
+export type RolePermission = AssignRolePermissionPayload & {
+  id: string;
+};
