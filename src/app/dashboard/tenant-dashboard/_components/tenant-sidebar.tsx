@@ -34,8 +34,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Briefcase, ChevronRight, ChevronsUpDown,  Images, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Store, User, UserCog } from "lucide-react"
+import { useAuthStore } from "@/app/stores/auth.store"
+import { usePermissionSidebar } from "./use-permission-sidebar"
 
-type NavItem = {
+export type NavItem = {
   title: string
   url: string
   icon?: React.ComponentType<{ className?: string }>
@@ -203,6 +205,7 @@ function NavGroup({
 
 export function TenantSidebar() {
   const pathname = usePathname()
+  const navPermissionItems = usePermissionSidebar(mainItems);
 
   return (
     <Sidebar collapsible="icon">
@@ -225,7 +228,7 @@ export function TenantSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavGroup label="Main" items={mainItems} pathname={pathname} />
+        <NavGroup label="Main" items={navPermissionItems} pathname={pathname} />
         <NavGroup label="System" items={systemItems} pathname={pathname} />
       </SidebarContent>
 

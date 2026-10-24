@@ -1,16 +1,17 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
-import { AuthResponse, AuthUser } from "../../../types/auth";
+import { AuthResponse, AuthUser, Permissions } from "../../../types/auth";
 import { authApi } from "@/lib/api/auth";
 
 type AuthState = {
   user: AuthUser | null;
   accessToken: string | null;
   refreshToken: string | null;
+  permission: Permissions[] | null;
   setAuth: (data: AuthResponse) => void;
   logout: () => void;
   refresh: () => Promise<string>;
-  initializeAuth: () => void;
+  initializeAuth: () => Promise<void>;
 };
 
 const cookieOptions = {
@@ -40,6 +41,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
   refreshToken: null,
+  permission: null,
 
   refresh: async () => {
     const { accessToken, refreshToken } = await authApi.refresh();
@@ -50,11 +52,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     return accessToken;
   },
 
-  setAuth: ({ user, accessToken, refreshToken }) => {
+  setAuth: ({ user, accessToken, refreshToken, permission }) => {
     Cookies.set(USER, JSON.stringify(user), cookieOptions);
     Cookies.set(ACCESS_TOKEN, accessToken, cookieOptions);
     Cookies.set(REFRESH_TOKEN, refreshToken, cookieOptions);
-    set({ user, accessToken, refreshToken });
+    set({ user, accessToken, refreshToken, permission });
   },
 
   logout: async () => {
@@ -69,7 +71,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
   
-  initializeAuth: () => {
+  initializeAuth: async () => {
     const userCookie = Cookies.get(USER);
     const accessToken = parseTokenCookie(Cookies.get(ACCESS_TOKEN));
     const refreshToken = parseTokenCookie(Cookies.get(REFRESH_TOKEN));
@@ -84,6 +86,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     set({ user, accessToken, refreshToken });
+
+    if (accessToken || refreshToken) {
+      try {
+        const response = await authApi.permission();
+        set({ permission: response.data });
+      } catch (error) {
+        console.error("Unable to load permissions:", error);
+      }
+    }
   },
 
 }));

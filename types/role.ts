@@ -47,3 +47,21 @@ export type RolePermission = {
   permissionId: string;
   id: string;
 };
+
+// permission
+
+export const RbacFeature = {
+  Gallery: "Gallery",
+  Permission: "Permission",
+  Employees: "Employees",
+} as const;
+export type RbacFeature = (typeof RbacFeature)[keyof typeof RbacFeature];
+
+export const PermissionAction = {
+  read: "read",
+  create: "create",
+  update: "update",
+  delete: "delete"
+} as const;
+export type PermissionAction =
+  (typeof PermissionAction)[keyof typeof PermissionAction];

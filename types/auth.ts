@@ -7,8 +7,16 @@ export type AuthUser = {
   photo?: string | null;
 };
 
+export type Permissions = {
+      id: string; 
+      featureKey: string; 
+      actionKey: string; 
+      description: string; 
+    };
+
 export type AuthResponse = {
   user: AuthUser;
+  permission: Permissions[];
   accessToken: string;
   refreshToken: string;
 };

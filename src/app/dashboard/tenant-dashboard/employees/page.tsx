@@ -20,8 +20,14 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import UseCheckPermission from "../_components/use-check-permission"
+import { PermissionAction, RbacFeature } from "../../../../../types/role"
 
 export default function EmployeesPage() {
+    const createPermissionCheck = UseCheckPermission(
+        RbacFeature.Employees,
+        PermissionAction.create
+    );
     const [page, setPage] = useState(1)
     const [search, setSearch] = useState("")
     const [status, setStatus] = useState<UserStatus | "">("")
@@ -262,14 +268,16 @@ export default function EmployeesPage() {
                                 <option value="INACTIVE">Inactive</option>
                                 <option value="SUSPENDED">Suspended</option>
                             </select>
-                            <div className="sm:ml-auto">
-                                <Link href="/dashboard/tenant-dashboard/employees/create">
-                                    <Button className="cursor-pointer">
-                                        <Plus aria-hidden="true" />
-                                        Create employee
-                                    </Button>
-                                </Link>
-                            </div>
+                            {createPermissionCheck && (
+                                <div className="sm:ml-auto">
+                                    <Link href="/dashboard/tenant-dashboard/employees/create">
+                                        <Button className="cursor-pointer">
+                                            <Plus aria-hidden="true" />
+                                            Create employee
+                                        </Button>
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     )}
                     pagination={{
