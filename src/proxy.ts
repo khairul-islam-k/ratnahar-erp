@@ -23,7 +23,11 @@ export function proxy(request: NextRequest) {
   const isAdminDashboard = pathname.startsWith("/dashboard/admin-dashboard");
 
   if (
-    (isTenantDashboard && userType !== "TENANT") ||
+    (
+      isTenantDashboard &&
+      userType !== "TENANT" &&
+      userType !== "EMPLOYEE"
+    ) ||
     (isAdminDashboard && userType !== "ADMIN")
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
