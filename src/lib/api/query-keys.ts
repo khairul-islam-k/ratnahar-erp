@@ -1,6 +1,7 @@
 import type { QueryType } from "../../../types/gallery";
 import type { EmployeeQuery } from "../../../types/employee";
 import type { RoleQuery } from "../../../types/role";
+import type { PackageQuery } from "../../../types/package";
 
 export const queryKeys = {
   gallery: {
@@ -22,5 +23,9 @@ export const queryKeys = {
   permission: {
     all: ["permission"] as const,
     list: () => ["permission", "list"] as const,
+  },
+  package: {
+    all: ["package"] as const,
+    list: (query?: PackageQuery) => ["package", "list", query] as const,
   },
 };

@@ -12,6 +12,8 @@ export type ToastMessage = ToastOptions & {
   confirmation?: {
     confirmLabel: string;
     cancelLabel: string;
+    destructive?: boolean;
+    cancelDestructive?: boolean;
     onConfirm: () => void;
     onCancel: () => void;
   };
@@ -46,12 +48,23 @@ export const toast = {
   
   confirm: (
     message: string,
-    options: ToastOptions & { confirmLabel?: string; cancelLabel?: string } = {},
+    options: ToastOptions & {
+      confirmLabel?: string;
+      cancelLabel?: string;
+      destructive?: boolean;
+      cancelDestructive?: boolean;
+    } = {},
   ): Promise<boolean> => {
     if (typeof window === "undefined") return Promise.resolve(false);
 
     return new Promise((resolve) => {
-      const { confirmLabel = "Confirm", cancelLabel = "Cancel", ...toastOptions } = options;
+      const {
+        confirmLabel = "Confirm",
+        cancelLabel = "Cancel",
+        destructive = false,
+        cancelDestructive = false,
+        ...toastOptions
+      } = options;
       const toast: ToastMessage = {
         id: ++nextToastId,
         variant: "warning",
@@ -61,6 +74,8 @@ export const toast = {
         confirmation: {
           confirmLabel,
           cancelLabel,
+          destructive,
+          cancelDestructive,
           onConfirm: () => resolve(true),
           onCancel: () => resolve(false),
         },

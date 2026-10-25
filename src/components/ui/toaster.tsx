@@ -70,7 +70,11 @@ export function Toaster() {
                     message.confirmation?.onCancel();
                     removeToast(message.id);
                   }}
-                  className="cursor-pointer rounded-md px-2 py-1 text-xs font-medium hover:bg-black/5 focus-visible:outline-2"
+                  className={`cursor-pointer rounded-md px-2 py-1 text-xs font-medium focus-visible:outline-2 ${
+                    message.confirmation.cancelDestructive
+                      ? "bg-red-100 text-red-700 hover:bg-red-200"
+                      : "hover:bg-black/5"
+                  }`}
                 >
                   {message.confirmation.cancelLabel}
                 </button>
@@ -80,7 +84,11 @@ export function Toaster() {
                     message.confirmation?.onConfirm();
                     removeToast(message.id);
                   }}
-                  className="cursor-pointer rounded-md bg-black/10 px-2 py-1 text-xs font-semibold hover:bg-black/15 focus-visible:outline-2"
+                  className={`cursor-pointer rounded-md px-2 py-1 text-xs font-semibold focus-visible:outline-2 ${
+                    message.confirmation.destructive
+                      ? "bg-red-600 text-white hover:bg-red-700"
+                      : "bg-black/10 hover:bg-black/15"
+                  }`}
                 >
                   {message.confirmation.confirmLabel}
                 </button>

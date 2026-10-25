@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Users,
-  ShoppingCart,
   Package,
   Settings,
   ChevronRight,
@@ -56,15 +55,9 @@ type NavItem = {
 const mainItems: NavItem[] = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   {
-    title: "Orders",
-    url: "/orders",
-    icon: ShoppingCart,
-    children: [
-      { title: "All Orders", url: "/orders" },
-      { title: "Pending", url: "/orders/pending" },
-      { title: "Completed", url: "/orders/completed" },
-      { title: "Returns", url: "/orders/returns" },
-    ],
+    title: "Packages",
+    url: "/dashboard/admin-dashboard/package",
+    icon: Package,
   },
   {
     title: "Products",
@@ -141,9 +134,8 @@ function NavItemRow({ item, pathname }: { item: NavItem; pathname: string }) {
         {item.icon && <item.icon />}
         <span>{item.title}</span>
         <ChevronRight
-          className={`ml-auto size-4 transition-transform duration-200 ${
-            open ? "rotate-90" : ""
-          }`}
+          className={`ml-auto size-4 transition-transform duration-200 ${open ? "rotate-90" : ""
+            }`}
         />
       </CollapsibleTrigger>
 

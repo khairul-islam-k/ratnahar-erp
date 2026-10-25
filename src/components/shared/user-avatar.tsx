@@ -40,9 +40,18 @@ const UserAvatar = () => {
     : "/dashboard/tenant-dashboard";
 
   const handleLogout = async () => {
+    const confirmed = await toast.confirm("Are you sure you want to log out?", {
+      confirmLabel: "Log out",
+      cancelLabel: "Cancel",
+      destructive: true,
+      cancelDestructive: true,
+    });
+    if (!confirmed) return;
+
     try {
       await logout.mutateAsync();
       router.push("/");
+      toast.success('logout successfully')
     } catch (error) {
       toast.error(getApiErrorMessage(error));
     }
