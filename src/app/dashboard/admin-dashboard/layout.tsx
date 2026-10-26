@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 import UserAvatar from "@/components/shared/user-avatar"
@@ -6,7 +7,9 @@ import { AppSidebar } from "./_components/app-sidebar"
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <Suspense fallback={<div className="w-16" aria-hidden="true" />}>
+        <AppSidebar />
+      </Suspense>
       <SidebarInset>
         <header className="flex h-14 items-center justify-between border-b px-4">
           <div className="flex items-center gap-2">

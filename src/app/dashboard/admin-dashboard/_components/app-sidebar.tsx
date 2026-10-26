@@ -53,31 +53,20 @@ type NavItem = {
 }
 
 const mainItems: NavItem[] = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  {
+    title: "Dashboard",
+    url: "/dashboard/admin-dashboard",
+    icon: LayoutDashboard
+  },
   {
     title: "Packages",
     url: "/dashboard/admin-dashboard/package",
     icon: Package,
   },
   {
-    title: "Products",
-    url: "/products",
+    title: "All Tenants",
+    url: "/dashboard/admin-dashboard/tenant",
     icon: Package,
-    children: [
-      { title: "All Products", url: "/products" },
-      { title: "Add Product", url: "/products/new" },
-      { title: "Categories", url: "/products/categories" },
-      { title: "Inventory", url: "/products/inventory" },
-    ],
-  },
-  {
-    title: "Users",
-    url: "/users",
-    icon: Users,
-    children: [
-      { title: "All Users", url: "/users" },
-      { title: "Roles", url: "/users/roles" },
-    ],
   },
 ]
 

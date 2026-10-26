@@ -9,7 +9,7 @@ type AuthState = {
   refreshToken: string | null;
   permission: Permissions[] | null;
   setAuth: (data: AuthResponse) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   refresh: () => Promise<string>;
   initializeAuth: () => Promise<void>;
 };
@@ -68,6 +68,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: null, accessToken: null, refreshToken: null });
     } catch (error) {
       console.error("Logout API request failed:", error);
+      throw error;
     }
   },
   

@@ -51,7 +51,7 @@ const UserAvatar = () => {
     try {
       await logout.mutateAsync();
       router.push("/");
-      toast.success('logout successfully')
+      toast.success("Logged out successfully.");
     } catch (error) {
       toast.error(getApiErrorMessage(error));
     }

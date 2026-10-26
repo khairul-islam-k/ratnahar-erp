@@ -3,7 +3,7 @@ export type AuthUser = {
   name: string;
   email: string;
   status: string;
-  type: 'ADMIN' | 'TENANT';
+  type: 'ADMIN' | 'TENANT' | 'EMPLOYEE';
   photo?: string | null;
 };
 

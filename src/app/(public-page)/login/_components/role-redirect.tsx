@@ -14,6 +14,8 @@ export default function RoleRedirect({ userType }: RoleRedirectProps) {
   useEffect(() => {
     switch (userType) {
       case "TENANT":
+        router.push("/dashboard/tenant-dashboard");
+        break;
       case "EMPLOYEE":
         router.push("/dashboard/tenant-dashboard");
         break;

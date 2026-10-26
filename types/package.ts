@@ -28,6 +28,31 @@ export interface PackageResponse {
   limits: PackageLimit[];
 }
 
+export interface PackageModuleInput {
+  moduleKey: string;
+  isEnabled: boolean;
+}
+
+export interface PackageLimitInput {
+  limitKey: string;
+  limitValue: number;
+}
+
+export interface PackagePayload {
+  name: string;
+  slug: string;
+  pricingType: PackagePricingType;
+  monthlyPrice: string;
+  yearlyPrice: string;
+  description: string;
+  status: PackageStatus;
+  modules: PackageModuleInput[];
+  limits: PackageLimitInput[];
+}
+
+export type CreatePackagePayload = PackagePayload;
+export type UpdatePackagePayload = PackagePayload;
+
 export type PackageQuery = {
   page: number;
   limit: number;
