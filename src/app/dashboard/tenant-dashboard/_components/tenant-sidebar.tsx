@@ -67,6 +67,21 @@ const mainItems: NavItem[] = [
     ],
   },
   {
+    title: "Business Management",
+    url: "/business",
+    icon: Briefcase,
+    children: [
+      {
+        title: "Current Subscription",
+        url: "/dashboard/tenant-dashboard/current-subscription"
+      },
+      {
+        title: "Upgrade Plan",
+        url: "/dashboard/tenant-dashboard/employees/roles"
+      },
+    ],
+  },
+  {
     title: "Orders",
     url: "/orders",
     icon: ShoppingCart,
@@ -87,16 +102,7 @@ const mainItems: NavItem[] = [
       { title: "Categories", url: "/products/categories" },
       { title: "Inventory", url: "/products/inventory" },
     ],
-  },
-  {
-    title: "Users",
-    url: "/users",
-    icon: UserCog,
-    children: [
-      { title: "All Users", url: "/users" },
-      { title: "Roles", url: "/users/roles" },
-    ],
-  },
+  }
 ];
 
 const systemItems: NavItem[] = [
