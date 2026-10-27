@@ -73,11 +73,11 @@ const mainItems: NavItem[] = [
     children: [
       {
         title: "Current Subscription",
-        url: "/dashboard/tenant-dashboard/current-subscription"
+        url: "/dashboard/tenant-dashboard/business/current-subscription"
       },
       {
         title: "Upgrade Plan",
-        url: "/dashboard/tenant-dashboard/employees/roles"
+        url: "/dashboard/tenant-dashboard/business/upgrate-plan"
       },
     ],
   },

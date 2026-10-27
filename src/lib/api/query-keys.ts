@@ -30,6 +30,9 @@ export const queryKeys = {
     list: (query?: PackageQuery) => ["package", "list", query] as const,
     detail: (id: string) => ["package", "detail", id] as const,
   },
+  subscription: {
+    all: ["subscription"] as const,
+  },
   tenantManage: {
     all: ["tenant-manage"] as const,
     list: (query?: TenantManageQuery) => ["tenant-manage", "list", query] as const,
